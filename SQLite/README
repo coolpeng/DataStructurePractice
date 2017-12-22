@@ -1,0 +1,3 @@
+终端执行以下命令
+gcc SQLiteDemo.c -o SQLiteDemo -l sqlite3
+./SQLiteDemo
