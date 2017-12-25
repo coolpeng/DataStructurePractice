@@ -110,14 +110,35 @@ bool findRecordByUrl(char *url) {
     asprintf(&sql, "%s'%s';","SELECT *FROM URL_TABLE WHERE url is ",url);
     
     /* Execute SQL statement */
-    ret = sqlite3_exec(db, sql, callback, 0, &zErrMsg);
-    if( ret != SQLITE_OK ){
-        fprintf(stderr, "Find records error: %s\n", zErrMsg);
-        sqlite3_free(zErrMsg);
-        free(sql);
-        return false;
+//    ret = sqlite3_exec(db, sql, callback, 0, &zErrMsg);
+//    if( ret != SQLITE_OK ){
+//        fprintf(stderr, "Find records error: %s\n", zErrMsg);
+//        sqlite3_free(zErrMsg);
+//        free(sql);
+//        return false;
+//    }
+    
+    //不使用回调函数查询数据库
+    char **dbResult = NULL;
+    int nRow, nColumn;
+    int index;
+    int i, j, result;
+    
+    // dbResult 中前nColumn 中存放的是列标题的信息，其后存放的是每行对应列的内容.
+    result = sqlite3_get_table(db, sql, &dbResult, &nRow,&nColumn, &zErrMsg);
+    if (result == SQLITE_OK) {
+        
+        index = nColumn;
+        printf("find %d record\n", nRow);
+        for (i = 0; i < nRow; i++) {
+            for (j = 0; j < nColumn; j++) {
+                printf("field name:%s ------> field values:%s\n",dbResult[j],
+                       dbResult[index]);
+                index++;
+            }printf("----------------------------------------------------------\n");
+        }
     }
-    //    fprintf(stdout, "Find records successfully\n");
+    
     free(sql);
     return true;
 }
@@ -152,8 +173,8 @@ int main(int argc, const char * argv[]) {
     printf("Hello, World!\n");
     
     connectDB();
-    createTable();
-    insertRecords("baidu.com", "w");
+//    createTable();
+//    insertRecords("baidu.com", "w");
     findRecordByUrl("baidu.com");
 //    showAllRecords();
     return 0;
